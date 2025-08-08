@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  ollama:
+    image: ollama/ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+
+  librechat:
+    image: librechat/librechat:latest
+    ports:
+      - "3080:3080"
+    environment:
+      - PORT=3080
+      - DEFAULT_ASSISTANT_MODEL=ollama/mistral
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - ALLOW_REGISTRATION=true
+      - ALLOW_SOCIAL_LOGIN=true
+      - MONGO_URI=mongodb://mongo:27017/librechat
+      - JWT_SECRET=aa9e710532cb543383d5f0529bdbf6036d65bf20f0b705fd26d788d63f9acea8
+      - JWT_REFRESH_SECRET=a67722f962dab554c3e8c464660f5eb8ae7a2bb8648bfa2b54e8938d3b766a67
+      - JWT_EXPIRATION=100y
+      - CORS_ORIGIN=*
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+    depends_on:
+      - mongo
+      - ollama
+    volumes:
+      - ./librechat.yaml:/app/librechat.yaml:ro
+    restart: always
+    runtime: nvidia
+
+  flowise:
+    image: flowiseai/flowise:1.4.3
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./flowise:/root/.flowise
+    environment:
+      - DATABASE_PATH=/root/.flowise
+
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=America/New_York
+    volumes:
+      - ./n8n:/home/node/.n8n
+
+volumes:
+  mongo-data:
+  ollama-data:
+

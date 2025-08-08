@@ -1,0 +1,33 @@
+version: 1.2.8
+cache: true
+
+endpoints:
+  custom:
+    - name: "Ollama"
+      apiKey: "dummy"
+      baseURL: "http://ollama:11434/v1"
+      models:
+        default:
+          - "mistral"
+        fetch: false  # Ollama does not support model listing via API
+      titleConvo: true
+      titleModel: "current_model"
+      summarize: false
+      summaryModel: "current_model"
+      forcePrompt: false
+      modelDisplayLabel: "Ollama"
+
+    - name: "OpenRouter"
+      apiKey: "${OPENROUTER_KEY}"
+      baseURL: "https://openrouter.ai/api/v1"
+      models:
+        default:
+          - "gpt-3.5-turbo"
+        fetch: true
+      titleConvo: true
+      titleModel: "current_model"
+      summarize: false
+      summaryModel: "current_model"
+      forcePrompt: false
+      modelDisplayLabel: "OpenRouter"
+

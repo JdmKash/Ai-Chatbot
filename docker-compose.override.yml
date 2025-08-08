@@ -1,0 +1,4 @@
+services:
+  librechat:
+    command: npm run backend:dev
+
